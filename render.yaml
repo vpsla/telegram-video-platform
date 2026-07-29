@@ -1,0 +1,57 @@
+# =============================================================================
+# Render Blueprint (Infrastructure as Code)
+# https://render.com/docs/blueprint-spec
+#
+# Deploys the bot as a single Docker-based web service. Database stays on
+# Supabase (per the original project spec: "Database sử dụng Supabase
+# PostgreSQL, không dùng SQLite") — this Blueprint intentionally does NOT
+# define a Render Postgres instance, since that would duplicate/conflict
+# with the Supabase-based architecture used throughout the app.
+#
+# Secrets (sync: false) are prompted for once, during the initial Blueprint
+# creation flow in the Render Dashboard — never hardcoded here.
+# =============================================================================
+
+services:
+  - type: web
+    name: telegram-video-platform
+    runtime: docker
+    plan: free # Đổi sang "starter" trở lên để tránh cold start (xem README)
+    region: oregon # Đổi theo region gần Supabase project của bạn nếu cần
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    autoDeployTrigger: commit
+
+    envVars:
+      # --- Non-secret defaults, safe to commit ---
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: "false"
+      - key: LOG_LEVEL
+        value: INFO
+      - key: TELEGRAM_WEBHOOK_PATH
+        value: /webhook/telegram
+      - key: REDIS_ENABLED
+        value: "false"
+      - key: DATABASE_ECHO
+        value: "false"
+
+      # --- Auto-generated secret (no manual input needed) ---
+      - key: TELEGRAM_WEBHOOK_SECRET_TOKEN
+        generateValue: true
+
+      # --- Prompted once at Blueprint creation time (never hardcoded) ---
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_STORAGE_CHANNEL_ID
+        sync: false
+      - key: DATABASE_URL
+        sync: false # Supabase Connection Pooling URI, port 6543
+      - key: ADMIN_IDS
+        sync: false
+
+      # --- Filled in AFTER first deploy, once the onrender.com domain is known ---
+      - key: TELEGRAM_WEBHOOK_BASE_URL
+        sync: false
