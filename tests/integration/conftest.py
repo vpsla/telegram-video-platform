@@ -50,7 +50,7 @@ async def pg_engine():
     try:
         async with engine.connect() as conn:
             await conn.close()
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         await engine.dispose()
         pytest.skip(f"Postgres not reachable at {url!r}: {exc}")
 
