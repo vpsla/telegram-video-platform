@@ -1,4 +1,11 @@
-"""Fixtures for Postgres-backed integration tests."""
+"""Fixtures for Postgres-backed integration tests.
+
+All async fixtures here use loop_scope="module" so that the engine,
+session factory, and individual test sessions share exactly one event
+loop per test module. This is the correct pattern for pytest-asyncio
+>= 0.23 when using module-scoped async resources with asyncpg, which
+is very strict about connection objects not crossing loop boundaries.
+"""
 
 from __future__ import annotations
 
@@ -9,20 +16,13 @@ from pathlib import Path
 
 import pytest
 import pytest_asyncio
-from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
 
 _PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
 def _database_url() -> str:
     return os.environ.get("DATABASE_URL", "")
-
-
-# pytest-asyncio >= 0.23 uses `loop_scope` on the fixture decorator instead
-# of overriding the deprecated `event_loop` fixture. Setting loop_scope="module"
-# ensures the engine is created and used within the same event loop for all
-# tests in the module, fixing "Future attached to a different loop" errors
-# that occur when asyncpg connections span different event loops.
 
 
 @pytest_asyncio.fixture(scope="module", loop_scope="module")
@@ -40,16 +40,16 @@ async def pg_engine():
     engine = create_async_engine(
         url,
         connect_args={"statement_cache_size": 0},
+        pool_pre_ping=True,
     )
     try:
-        async with engine.connect():
-            pass
-    except Exception as exc:
+        async with engine.connect() as conn:
+            await conn.close()
+    except Exception as exc:  # noqa: BLE001
         await engine.dispose()
         pytest.skip(f"Postgres not reachable at {url!r}: {exc}")
 
-    # Reset schema then apply all migrations — this proves the full
-    # migration chain (Phase 1-6) works end-to-end on real Postgres.
+    # Reset schema then apply all migrations end-to-end on real Postgres.
     env = os.environ.copy()
     subprocess.run(
         [sys.executable, "-m", "alembic", "downgrade", "base"],
@@ -75,11 +75,21 @@ async def pg_engine():
 
 @pytest_asyncio.fixture(scope="module", loop_scope="module")
 async def pg_session_factory(pg_engine: AsyncEngine):
-    return async_sessionmaker(bind=pg_engine, expire_on_commit=False)
+    return async_sessionmaker(
+        bind=pg_engine,
+        class_=AsyncSession,
+        expire_on_commit=False,
+        autoflush=False,
+    )
 
 
-@pytest_asyncio.fixture(loop_scope="module")
-async def pg_session(pg_session_factory):
+@pytest_asyncio.fixture(scope="function", loop_scope="module")
+async def pg_session(pg_session_factory: async_sessionmaker[AsyncSession]):
+    """Function-scoped session, but runs in the module's shared event loop.
+
+    Rolls back after every test so each test starts with a clean state
+    without having to recreate the expensive module-scoped engine.
+    """
     async with pg_session_factory() as session:
         yield session
         await session.rollback()
