@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-import asyncio
 import os
 
 import pytest
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
+# Set required env vars before any app module is imported, since
+# AppSettings() is instantiated at import time in app.main.
 os.environ.setdefault("TELEGRAM_BOT_TOKEN", "000000:TEST-TOKEN-NOT-REAL")
 os.environ.setdefault("TELEGRAM_STORAGE_CHANNEL_ID", "-1001111111111")
 os.environ.setdefault("TELEGRAM_WEBHOOK_BASE_URL", "https://example.com")
@@ -15,15 +15,6 @@ os.environ.setdefault("TELEGRAM_WEBHOOK_SECRET_TOKEN", "test-secret")
 os.environ.setdefault(
     "DATABASE_URL", "postgresql+asyncpg://postgres:postgres@localhost:5432/test_db"
 )
-
-
-@pytest.fixture(scope="session")
-def event_loop():
-    """Tạo event loop duy nhất cho session để fix lỗi 'different loop'."""
-    policy = asyncio.get_event_loop_policy()
-    loop = policy.new_event_loop()
-    yield loop
-    loop.close()
 
 
 @pytest.fixture
@@ -36,34 +27,42 @@ def settings():
 
 @pytest.fixture
 async def db_session():
-    from app.database import models  # noqa: F401
+    """A fresh in-memory SQLite async session per test.
+
+    Engine is created AND used within the same async fixture — everything
+    runs in the same event loop that pytest-asyncio provides for this test
+    function, so there is no "attached to a different loop" risk.
+
+    SQLite stands in for Supabase Postgres in unit tests: fast, no network,
+    no external service required. Postgres-specific behavior is covered by
+    tests/integration/ which run against a real Postgres instance in CI.
+    """
+    from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+
+    from app.database import models  # noqa: F401  (populates Base.metadata)
     from app.database.base import Base
 
-    engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+    # Create engine inside the fixture (same event loop as the test).
+    engine = create_async_engine(
+        "sqlite+aiosqlite:///:memory:",
+        # aiosqlite does not support multi-threaded sharing; check_same_thread
+        # is already False by default in SQLAlchemy's aiosqlite dialect.
+    )
+
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-    session_factory = async_sessionmaker(bind=engine, expire_on_commit=False)
+    session_factory = async_sessionmaker(
+        bind=engine,
+        class_=AsyncSession,
+        expire_on_commit=False,
+        autoflush=False,
+    )
+
     async with session_factory() as session:
         yield session
+        # Always rollback at the end so each test starts with a clean slate.
+        await session.rollback()
+
+    # Dispose the engine after the session is fully closed.
     await engine.dispose()
-
-
-@pytest.fixture(scope="session")
-async def pg_engine():
-    from app.database.base import Base
-
-    db_url = os.getenv("DATABASE_URL")
-    if db_url and db_url.startswith("postgresql://"):
-        db_url = db_url.replace("postgresql://", "postgresql+asyncpg://", 1)
-
-    engine = create_async_engine(db_url, pool_pre_ping=True)
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    yield engine
-    await engine.dispose()
-
-
-@pytest.fixture
-async def pg_session_factory(pg_engine):
-    return async_sessionmaker(bind=pg_engine, expire_on_commit=False, autoflush=True)
