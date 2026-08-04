@@ -58,12 +58,15 @@ select = [
 ]
 ignore = ["E501"]  # line length handled by black
 
+<<<<<<< HEAD
 [tool.ruff.lint.per-file-ignores]
 # FastAPI's Depends() pattern is idiomatic and intentionally used as a
 # default argument value — this is not the mutable-default-argument
 # footgun that B008 is designed to catch.
 "app/api.py" = ["B008"]
 
+=======
+>>>>>>> aa711cf084e31aa3c44790aacdffc3901927f779
 [tool.ruff.lint.isort]
 known-first-party = ["app"]
 
@@ -79,10 +82,13 @@ target-version = ["py312"]
 # ---------------------------------------------------------------------------
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+<<<<<<< HEAD
 # All async fixtures and tests run in a fresh function-scoped event loop
 # by default. Integration tests that need a module-scoped loop declare
 # loop_scope="module" explicitly on their fixtures (see
 # tests/integration/conftest.py).
+=======
+>>>>>>> aa711cf084e31aa3c44790aacdffc3901927f779
 asyncio_default_fixture_loop_scope = "function"
 testpaths = ["tests"]
 addopts = "-v --cov=app --cov-report=term-missing"

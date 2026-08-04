@@ -48,6 +48,7 @@ class TelegramSettings(BaseSettings):
         ..., description="Secret token Telegram sends in X-Telegram-Bot-Api-Secret-Token header"
     )
 
+<<<<<<< HEAD
     # Mini App (optional — only needed if the Telegram Mini App frontend
     # is deployed). Leave unset to disable the "Mở Mini App" button.
     miniapp_url: str | None = Field(
@@ -55,6 +56,8 @@ class TelegramSettings(BaseSettings):
         description="Public URL of the deployed Mini App frontend, e.g. https://user.github.io/repo/",
     )
 
+=======
+>>>>>>> aa711cf084e31aa3c44790aacdffc3901927f779
     @property
     def webhook_url(self) -> str:
         return f"{self.webhook_base_url.rstrip('/')}{self.webhook_path}"

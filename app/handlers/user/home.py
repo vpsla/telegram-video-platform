@@ -8,7 +8,10 @@ from aiogram import F, Router
 from aiogram.filters import Command
 from aiogram.types import CallbackQuery, Message
 
+<<<<<<< HEAD
 from app.config.settings import AppSettings
+=======
+>>>>>>> aa711cf084e31aa3c44790aacdffc3901927f779
 from app.keyboards.user import home_menu_keyboard
 
 logger = logging.getLogger(__name__)
@@ -19,6 +22,7 @@ _HOME_TEXT = "🏠 <b>Trang chủ</b>\n\nChọn một mục bên dưới để b
 
 
 @router.message(Command("menu"))
+<<<<<<< HEAD
 async def show_home_menu(message: Message, settings: AppSettings) -> None:
     await message.answer(_HOME_TEXT, reply_markup=home_menu_keyboard(settings.telegram.miniapp_url))
 
@@ -29,4 +33,14 @@ async def back_to_home_menu(callback: CallbackQuery, settings: AppSettings) -> N
         await callback.message.edit_text(
             _HOME_TEXT, reply_markup=home_menu_keyboard(settings.telegram.miniapp_url)
         )
+=======
+async def show_home_menu(message: Message) -> None:
+    await message.answer(_HOME_TEXT, reply_markup=home_menu_keyboard())
+
+
+@router.callback_query(F.data == "home:menu")
+async def back_to_home_menu(callback: CallbackQuery) -> None:
+    if callback.message is not None:
+        await callback.message.edit_text(_HOME_TEXT, reply_markup=home_menu_keyboard())
+>>>>>>> aa711cf084e31aa3c44790aacdffc3901927f779
     await callback.answer()

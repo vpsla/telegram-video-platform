@@ -2,7 +2,11 @@
 
 from __future__ import annotations
 
+<<<<<<< HEAD
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
+=======
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+>>>>>>> aa711cf084e31aa3c44790aacdffc3901927f779
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from app.database.models.category import Category
@@ -11,12 +15,17 @@ from app.database.models.series import Series
 from app.database.models.video import Video
 
 
+<<<<<<< HEAD
 def home_menu_keyboard(miniapp_url: str | None = None) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     if miniapp_url:
         builder.row(
             InlineKeyboardButton(text="🌐 Mở Mini App", web_app=WebAppInfo(url=miniapp_url))
         )
+=======
+def home_menu_keyboard() -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+>>>>>>> aa711cf084e31aa3c44790aacdffc3901927f779
     builder.row(
         InlineKeyboardButton(text="🆕 Video mới", callback_data="browse:newest:0"),
         InlineKeyboardButton(text="🔥 Nổi bật", callback_data="browse:featured:0"),

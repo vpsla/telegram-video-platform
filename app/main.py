@@ -20,9 +20,13 @@ from typing import Any
 
 from aiogram.types import Update
 from fastapi import FastAPI, Header, HTTPException, Request, Response, status
+<<<<<<< HEAD
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import api_router
+=======
+
+>>>>>>> aa711cf084e31aa3c44790aacdffc3901927f779
 from app.config.settings import get_settings
 from app.core.bot import create_bot, create_dispatcher
 from app.core.logging import setup_logging
@@ -46,8 +50,11 @@ dispatcher.include_router(main_router)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+<<<<<<< HEAD
     # Expose session_factory for REST API endpoints
     app.state.session_factory = session_factory
+=======
+>>>>>>> aa711cf084e31aa3c44790aacdffc3901927f779
     logger.info("Starting up: setting Telegram webhook -> %s", settings.telegram.webhook_url)
     await bot.set_webhook(
         url=settings.telegram.webhook_url,
@@ -68,6 +75,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+<<<<<<< HEAD
 # CORS cho Mini App frontend (GitHub Pages hoặc bất kỳ domain nào)
 app.add_middleware(
     CORSMiddleware,
@@ -79,6 +87,8 @@ app.add_middleware(
 # REST API cho Mini App
 app.include_router(api_router)
 
+=======
+>>>>>>> aa711cf084e31aa3c44790aacdffc3901927f779
 
 @app.get("/health", status_code=status.HTTP_200_OK)
 async def health() -> dict[str, Any]:

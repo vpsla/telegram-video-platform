@@ -8,16 +8,26 @@ Create Date: 2026-07-25 16:36:08
 
 from __future__ import annotations
 
+<<<<<<< HEAD
 from typing import Sequence, Union
+=======
+from collections.abc import Sequence
+>>>>>>> aa711cf084e31aa3c44790aacdffc3901927f779
 
 import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "20260725_0001"
+<<<<<<< HEAD
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
+=======
+down_revision: str | None = None
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
+>>>>>>> aa711cf084e31aa3c44790aacdffc3901927f779
 
 
 def upgrade() -> None:
@@ -49,9 +59,13 @@ def upgrade() -> None:
             nullable=False,
         ),
     )
+<<<<<<< HEAD
     op.create_index(
         "ix_users_telegram_id", "users", ["telegram_id"], unique=True
     )
+=======
+    op.create_index("ix_users_telegram_id", "users", ["telegram_id"], unique=True)
+>>>>>>> aa711cf084e31aa3c44790aacdffc3901927f779
 
 
 def downgrade() -> None:

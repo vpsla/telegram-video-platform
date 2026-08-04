@@ -8,16 +8,26 @@ Create Date: 2026-07-26 18:00:00
 
 from __future__ import annotations
 
+<<<<<<< HEAD
 from typing import Sequence, Union
+=======
+from collections.abc import Sequence
+>>>>>>> aa711cf084e31aa3c44790aacdffc3901927f779
 
 import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "20260726_0004"
+<<<<<<< HEAD
 down_revision: Union[str, None] = "20260726_0003"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
+=======
+down_revision: str | None = "20260726_0003"
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
+>>>>>>> aa711cf084e31aa3c44790aacdffc3901927f779
 
 
 def upgrade() -> None:
@@ -55,9 +65,13 @@ def upgrade() -> None:
             "updated_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False
         ),
     )
+<<<<<<< HEAD
     op.create_index(
         "ix_notifications_user_created", "notifications", ["user_id", "created_at"]
     )
+=======
+    op.create_index("ix_notifications_user_created", "notifications", ["user_id", "created_at"])
+>>>>>>> aa711cf084e31aa3c44790aacdffc3901927f779
 
 
 def downgrade() -> None:

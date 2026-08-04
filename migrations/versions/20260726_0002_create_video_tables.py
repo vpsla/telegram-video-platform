@@ -8,16 +8,26 @@ Create Date: 2026-07-26 10:00:00
 
 from __future__ import annotations
 
+<<<<<<< HEAD
 from typing import Sequence, Union
+=======
+from collections.abc import Sequence
+>>>>>>> aa711cf084e31aa3c44790aacdffc3901927f779
 
 import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "20260726_0002"
+<<<<<<< HEAD
 down_revision: Union[str, None] = "20260725_0001"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
+=======
+down_revision: str | None = "20260725_0001"
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
+>>>>>>> aa711cf084e31aa3c44790aacdffc3901927f779
 
 
 def upgrade() -> None:
@@ -107,7 +117,14 @@ def upgrade() -> None:
         "episodes",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
         sa.Column(
+<<<<<<< HEAD
             "series_id", sa.Integer(), sa.ForeignKey("series.id", ondelete="CASCADE"), nullable=False
+=======
+            "series_id",
+            sa.Integer(),
+            sa.ForeignKey("series.id", ondelete="CASCADE"),
+            nullable=False,
+>>>>>>> aa711cf084e31aa3c44790aacdffc3901927f779
         ),
         sa.Column(
             "video_id",

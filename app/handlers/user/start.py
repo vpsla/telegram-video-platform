@@ -15,7 +15,10 @@ from aiogram import Router
 from aiogram.filters import CommandStart
 from aiogram.types import Message
 
+<<<<<<< HEAD
 from app.config.settings import AppSettings
+=======
+>>>>>>> aa711cf084e31aa3c44790aacdffc3901927f779
 from app.database.models.user import User
 from app.keyboards.user import home_menu_keyboard
 
@@ -25,7 +28,11 @@ router = Router(name="start")
 
 
 @router.message(CommandStart())
+<<<<<<< HEAD
 async def handle_start(message: Message, user: User, settings: AppSettings) -> None:
+=======
+async def handle_start(message: Message, user: User) -> None:
+>>>>>>> aa711cf084e31aa3c44790aacdffc3901927f779
     logger.info("Received /start from telegram_id=%s", user.telegram_id)
 
     greeting = (
@@ -37,5 +44,9 @@ async def handle_start(message: Message, user: User, settings: AppSettings) -> N
     await message.answer(
         f"{greeting}\n\n"
         "Nền tảng xem video truyện/audio - xem, tìm kiếm, theo dõi bộ truyện yêu thích.",
+<<<<<<< HEAD
         reply_markup=home_menu_keyboard(settings.telegram.miniapp_url),
+=======
+        reply_markup=home_menu_keyboard(),
+>>>>>>> aa711cf084e31aa3c44790aacdffc3901927f779
     )

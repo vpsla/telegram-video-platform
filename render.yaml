@@ -55,8 +55,11 @@ services:
       # --- Filled in AFTER first deploy, once the onrender.com domain is known ---
       - key: TELEGRAM_WEBHOOK_BASE_URL
         sync: false
+<<<<<<< HEAD
 
       # --- Optional: URL of the deployed Mini App frontend (GitHub Pages) ---
       # Leave blank to disable the "Mở Mini App" button in the bot menu.
       - key: TELEGRAM_MINIAPP_URL
         sync: false
+=======
+>>>>>>> aa711cf084e31aa3c44790aacdffc3901927f779

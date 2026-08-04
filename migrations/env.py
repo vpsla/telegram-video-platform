@@ -20,11 +20,18 @@ from sqlalchemy import Connection, pool
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from app.config.settings import get_settings
+<<<<<<< HEAD
 from app.database.base import Base
+=======
+>>>>>>> aa711cf084e31aa3c44790aacdffc3901927f779
 
 # Import all model modules here so Base.metadata is fully populated
 # before autogenerate compares it against the live database.
 from app.database import models  # noqa: F401
+<<<<<<< HEAD
+=======
+from app.database.base import Base
+>>>>>>> aa711cf084e31aa3c44790aacdffc3901927f779
 
 config = context.config
 
